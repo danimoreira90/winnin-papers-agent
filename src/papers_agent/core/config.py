@@ -5,6 +5,7 @@ Backed by pydantic-settings: the resulting Settings object is frozen
 credentials in SecretStr so they never leak through repr or logs.
 """
 
+import pathlib
 from functools import lru_cache
 from typing import Self
 
@@ -32,6 +33,9 @@ class Settings(BaseSettings):
     chroma_host: str = "localhost"
     chroma_port: int = Field(default=8000, ge=1, le=65535)
     chroma_collection: str = "papers"
+
+    # === Data ===
+    pdf_dir: pathlib.Path = pathlib.Path("/app/pdfs")
 
     # === SQLite ===
     database_url: str = "sqlite+aiosqlite:///data/papers_agent.sqlite"
