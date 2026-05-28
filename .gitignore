@@ -1,0 +1,41 @@
+﻿# === Planning docs (LOCAL ONLY) ===
+CLAUDE.md
+AGENTS.md
+docs/agentic-engineering/
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+
+# === Environments e secrets ===
+.env
+.env.local
+*.env
+
+# === Testing & coverage ===
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# === Docker e dados ===
+chroma_data/
+sqlite_data/
+pdfs/
+*.sqlite
+*.sqlite-journal
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
