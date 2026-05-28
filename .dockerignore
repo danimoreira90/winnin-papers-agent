@@ -1,0 +1,61 @@
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+
+# Virtualenvs / build artifacts
+.venv/
+venv/
+env/
+build/
+dist/
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Lint and type-check caches
+.mypy_cache/
+.ruff_cache/
+
+# Local secrets — never bake into image
+.env
+.env.local
+.env.*.local
+
+# Git metadata
+.git/
+.gitignore
+.gitattributes
+
+# Engineering planning docs (kept on host, not shipped in image)
+docs/agentic-engineering/
+CLAUDE.md
+AGENTS.md
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Docker meta (not copied into image; reduces context size)
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Local data volumes (mounted, not baked)
+data/
+pdfs/
