@@ -39,3 +39,12 @@ pdfs/
 *.swp
 .DS_Store
 Thumbs.db
+
+# === SQLite WAL artifacts ===
+*.sqlite-shm
+*.sqlite-wal
+
+# === Setuptools / packaging ===
+build/
+dist/
+*.egg-info/
