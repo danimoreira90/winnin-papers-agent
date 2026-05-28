@@ -7,11 +7,13 @@ services:
     volumes:
       - chroma_data:/data
     healthcheck:
+      # chromadb/chroma:1.5.x is distroless-like: no python/curl/wget in PATH.
+      # Use bash builtin /dev/tcp for zero-dep TCP port check (PLAN v1.0.6 PA15).
       test:
         - CMD
-        - python
+        - /bin/bash
         - -c
-        - "import urllib.request, sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/v2/heartbeat', timeout=3).status == 200 else 1)"
+        - "</dev/tcp/localhost/8000"
       interval: 10s
       timeout: 5s
       retries: 5
