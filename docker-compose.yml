@@ -1,0 +1,39 @@
+services:
+  chroma:
+    image: chromadb/chroma:1.5.9
+    container_name: papers_chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request, sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/v2/heartbeat', timeout=3).status == 200 else 1)"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build: .
+    container_name: papers_api
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - CHROMA_HOST=chroma
+    volumes:
+      - sqlite_data:/data
+      - pdfs:/app/pdfs
+    depends_on:
+      chroma:
+        condition: service_healthy
+
+volumes:
+  chroma_data:
+  sqlite_data:
+  pdfs:
