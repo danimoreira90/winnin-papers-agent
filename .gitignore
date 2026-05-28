@@ -48,3 +48,6 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
+
+# === Build / runtime logs ===
+*.log
