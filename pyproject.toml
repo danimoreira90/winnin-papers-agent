@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "winnin-papers-agent"
+version = "0.1.0"
+description = "Multi-agent system for analyzing ML research papers."
+requires-python = ">=3.12"
+authors = [
+    { name = "Daniel Moreira", email = "danielcm90@gmail.com" },
+]
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]",
+    "pydantic>=2.9",
+    "pydantic-settings",
+    "sqlalchemy[asyncio]>=2.0",
+    "aiosqlite",
+    "google-genai",
+    "chromadb>=1.0",
+    "pymupdf",
+    "httpx",
+    "structlog",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["papers_agent*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "ASYNC", "SIM", "RUF"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+files = ["src", "scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
