@@ -8,11 +8,13 @@ the OrchestratorAgent (F5), not here.
 
 from typing import Protocol
 
-from google import genai
-from google.genai import types
 from pydantic import BaseModel, SecretStr
 
 from papers_agent.core.logging import get_logger
+
+# google.genai is imported lazily inside __init__/generate to keep
+# Protocol-only consumers (tools, tests with AsyncMock) free of the
+# heavy module-load side effects (gRPC/httpx/OpenSSL bootstrap).
 
 log = get_logger(__name__)
 
@@ -37,6 +39,8 @@ class GeminiEmbeddingClient:
     """EmbeddingClient implementation backed by google-genai embed_content."""
 
     def __init__(self, api_key: SecretStr, model: str) -> None:
+        from google import genai
+
         # Materialize the secret only here, pass to the SDK, and drop the ref.
         self._client = genai.Client(api_key=api_key.get_secret_value())
         self._model = model
@@ -59,6 +63,8 @@ class GeminiLLMClient:
     """LLMClient implementation backed by google-genai generate_content."""
 
     def __init__(self, api_key: SecretStr, model: str) -> None:
+        from google import genai
+
         self._client = genai.Client(api_key=api_key.get_secret_value())
         self._model = model
 
@@ -68,6 +74,8 @@ class GeminiLLMClient:
         response_schema: type[BaseModel] | None = None,
     ) -> str:
         """Single-shot LLM call. response_schema triggers JSON structured mode."""
+        from google.genai import types
+
         config = types.GenerateContentConfig()
         if response_schema is not None:
             config.response_mime_type = "application/json"
