@@ -9,6 +9,12 @@ the OrchestratorAgent (F5), not here.
 from typing import Protocol
 
 from pydantic import BaseModel, SecretStr
+from tenacity import (
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from papers_agent.core.logging import get_logger
 
@@ -17,6 +23,26 @@ from papers_agent.core.logging import get_logger
 # heavy module-load side effects (gRPC/httpx/OpenSSL bootstrap).
 
 log = get_logger(__name__)
+
+
+def _is_rate_limit(exc: BaseException) -> bool:
+    """True for Gemini 429 RESOURCE_EXHAUSTED rate-limit errors.
+
+    Structural check (getattr) instead of isinstance so this module does
+    not import google.genai.errors at module load - preserving the lazy
+    import pattern that keeps the OpenSSL bootstrap out of Protocol-only
+    consumers on Windows. google.genai.errors.ClientError exposes .code;
+    429 marks rate limits.
+    """
+    return getattr(exc, "code", None) == 429
+
+
+_rate_limit_retry = retry(
+    retry=retry_if_exception(_is_rate_limit),
+    wait=wait_exponential(multiplier=2, min=15, max=90),
+    stop=stop_after_attempt(5),
+    reraise=True,
+)
 
 
 class EmbeddingClient(Protocol):
@@ -45,6 +71,7 @@ class GeminiEmbeddingClient:
         self._client = genai.Client(api_key=api_key.get_secret_value())
         self._model = model
 
+    @_rate_limit_retry
     async def embed(self, texts: list[str]) -> list[list[float]]:
         """Embed texts in batch; returns one vector per input, same order."""
         result = await self._client.aio.models.embed_content(
@@ -68,6 +95,7 @@ class GeminiLLMClient:
         self._client = genai.Client(api_key=api_key.get_secret_value())
         self._model = model
 
+    @_rate_limit_retry
     async def generate(
         self,
         prompt: str,
