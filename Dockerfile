@@ -45,6 +45,13 @@ ENV PATH=/opt/venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
+# Pre-create the volume mount points (/app/pdfs for ingested PDFs,
+# /data for the SQLite database) owned by app. Docker copies the
+# directory's ownership/perms from the image when a named volume is
+# empty on first mount, so the volumes inherit app:app and the
+# non-root runtime can write to them.
+RUN mkdir -p /app/pdfs /data && chown app:app /app/pdfs /data
+
 USER app
 EXPOSE 8080
 
