@@ -21,6 +21,7 @@ from papers_agent.infra.pdf_parser import build_chunks, parse_pdf
 log = get_logger(__name__)
 
 EMBED_BATCH = 10
+_EMBED_BATCH_DELAY_SECONDS = 6.0
 ARXIV_PDF_URL = "https://arxiv.org/pdf/{arxiv_id}.pdf"
 
 
@@ -72,6 +73,12 @@ async def _ingest_paper(
                 for c in batch
             ],
         )
+        # Throttle between batches (not after the last) to stay under the
+        # Gemini free-tier ~10 RPM ceiling; the rate-limit retry in
+        # gemini_client.py covers any residual 429s.
+        if start + EMBED_BATCH < len(chunks):
+            log.info("ingest.throttle", seconds=_EMBED_BATCH_DELAY_SECONDS)
+            await asyncio.sleep(_EMBED_BATCH_DELAY_SECONDS)
     log.info("ingest.paper.done", paper_id=paper.paper_id, n_chunks=len(chunks))
     return len(chunks)
 
