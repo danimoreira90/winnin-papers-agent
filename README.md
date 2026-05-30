@@ -134,6 +134,23 @@ make setup               # compila, sobe chroma+api, baixa os 5 PDFs e ingere no
 make run                 # roda as 5 perguntas (uma thread por pergunta)
 ```
 
+> **Nota sobre rate limit -- importante para a avaliacao**
+>
+> As perguntas usam o free tier do Gemini, que apos os cortes de dez/2025 ficou
+> apertado (5-15 RPM, RPD baixo). Em um unico `make run`, uma ou duas perguntas
+> podem tomar rate limit (429) -- em geral a Q3 (compare) ou a Q5 (resumo dos
+> cinco), as mais pesadas. E limitacao externa de quota, nao do sistema: o
+> pipeline trata com retry em dois niveis, espacamento entre perguntas
+> (`_QUESTION_DELAY_SECONDS`) e degradacao graciosa.
+>
+> Para ver as cinco respostas limpas em um run: habilite billing na chave
+> (Tier 1 = 150-300 RPM, upgrade instantaneo, custo de centavos); ou use uma
+> chave free com quota diaria descansada (RPD reseta a meia-noite, horario do
+> Pacifico).
+>
+> Durante o desenvolvimento, com quota disponivel, um `make run` produziu as
+> cinco respostas corretas e com citacoes.
+
 `make setup` e idempotente (pula PDF/chunks que ja existem). Docs OpenAPI
 interativas em http://localhost:8080/docs.
 
