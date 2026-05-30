@@ -148,8 +148,6 @@ make run                 # roda as 5 perguntas (uma thread por pergunta)
 > chave free com quota diaria descansada (RPD reseta a meia-noite, horario do
 > Pacifico).
 >
-> Durante o desenvolvimento, com quota disponivel, um `make run` produziu as
-> cinco respostas corretas e com citacoes.
 
 `make setup` e idempotente (pula PDF/chunks que ja existem). Docs OpenAPI
 interativas em http://localhost:8080/docs.
