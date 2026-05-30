@@ -2,16 +2,14 @@
 
 from unittest.mock import AsyncMock
 
-from papers_agent.infra.chroma_client import QueryResult
+from papers_agent.core.ports import QueryResult
 from papers_agent.tools.search_documents import (
     SearchDocumentsInput,
     SearchDocumentsTool,
 )
 
 
-async def test_search_returns_chunks(
-    mock_embedder: AsyncMock, mock_vs: AsyncMock
-) -> None:
+async def test_search_returns_chunks(mock_embedder: AsyncMock, mock_vs: AsyncMock) -> None:
     mock_vs.query.return_value = QueryResult(
         ids=["attention:0001"],
         distances=[0.12],
@@ -30,17 +28,16 @@ async def test_search_returns_chunks(
     mock_embedder.embed.assert_awaited_once_with(["self-attention"])
 
 
-async def test_search_filters_by_paper_ids(
-    mock_embedder: AsyncMock, mock_vs: AsyncMock
-) -> None:
+async def test_search_filters_by_paper_ids(mock_embedder: AsyncMock, mock_vs: AsyncMock) -> None:
     mock_vs.query.return_value = QueryResult(
-        ids=[], distances=[], metadatas=[], documents=[],
+        ids=[],
+        distances=[],
+        metadatas=[],
+        documents=[],
     )
     tool = SearchDocumentsTool(mock_embedder, mock_vs)
     await tool.run(
-        SearchDocumentsInput(
-            query="anything", paper_ids=["react", "toolformer"], top_k=5
-        )
+        SearchDocumentsInput(query="anything", paper_ids=["react", "toolformer"], top_k=5)
     )
 
     call = mock_vs.query.await_args

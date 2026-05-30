@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from papers_agent.core.logging import get_logger
 from papers_agent.core.models import Chunk, ToolResult
-from papers_agent.infra.chroma_client import VectorStoreClient
+from papers_agent.core.ports import VectorStoreClient
 from papers_agent.tools.base import Tool
 
 log = get_logger(__name__)

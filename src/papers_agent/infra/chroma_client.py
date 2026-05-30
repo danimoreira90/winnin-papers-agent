@@ -1,94 +1,23 @@
 """ChromaDB async adapter.
 
-Defines the VectorStoreClient Protocol, frozen Pydantic wrappers around
-ChromaDB's query/get results, and a concrete ChromaVectorStore backed by
-chromadb.AsyncHttpClient (server mode, 1.5.x). setup() must be invoked
+Concrete VectorStoreClient implementation backed by chromadb's
+AsyncHttpClient (server mode, 1.5.x). The Protocol and the GetResult /
+QueryResult value types live in papers_agent.core.ports so consumers
+depend on the abstraction, not on this adapter. setup() must be invoked
 once before any I/O method; production wiring calls it from the FastAPI
 lifespan (T6.5) or from the ingestion script (T3.2).
 """
 
-from typing import Any, Protocol, cast
+from typing import Any, cast
 
 import chromadb
 from chromadb.api import AsyncClientAPI
 from chromadb.api.models.AsyncCollection import AsyncCollection
-from pydantic import BaseModel, ConfigDict
 
 from papers_agent.core.logging import get_logger
-from papers_agent.core.models import Chunk
+from papers_agent.core.ports import GetResult, QueryResult
 
 log = get_logger(__name__)
-
-
-def _chunk_from_raw(chunk_id: str, document: str, metadata: dict[str, Any]) -> Chunk:
-    """Rebuild a domain Chunk from one raw Chroma row."""
-    return Chunk(
-        chunk_id=chunk_id,
-        paper_id=metadata["paper_id"],
-        text=document,
-        section=metadata.get("section"),
-        page=metadata.get("page"),
-        char_start=0,
-        char_end=len(document),
-    )
-
-
-class QueryResult(BaseModel):
-    """Wrapped result of an embedding-based query (one query in, top_k out)."""
-
-    model_config = ConfigDict(frozen=True)
-
-    ids: list[str]
-    distances: list[float]
-    metadatas: list[dict[str, Any]]
-    documents: list[str]
-
-    def to_chunks(self) -> list[Chunk]:
-        """Rebuild Chunk entities from the query result, in rank order."""
-        return [
-            _chunk_from_raw(cid, doc, meta)
-            for cid, doc, meta in zip(self.ids, self.documents, self.metadatas, strict=True)
-        ]
-
-
-class GetResult(BaseModel):
-    """Wrapped result of a metadata-filter fetch (no scoring)."""
-
-    model_config = ConfigDict(frozen=True)
-
-    ids: list[str]
-    metadatas: list[dict[str, Any]]
-    documents: list[str]
-
-    def to_chunks(self) -> list[Chunk]:
-        """Rebuild Chunk entities from the get result."""
-        return [
-            _chunk_from_raw(cid, doc, meta)
-            for cid, doc, meta in zip(self.ids, self.documents, self.metadatas, strict=True)
-        ]
-
-
-class VectorStoreClient(Protocol):
-    """Async vector-store contract used by tools and agents."""
-
-    async def upsert(
-        self,
-        ids: list[str],
-        embeddings: list[list[float]],
-        documents: list[str],
-        metadatas: list[dict[str, Any]],
-    ) -> None: ...
-
-    async def query(
-        self,
-        embedding: list[float],
-        top_k: int,
-        where: dict[str, Any] | None = None,
-    ) -> QueryResult: ...
-
-    async def get(self, where: dict[str, Any]) -> GetResult: ...
-
-    async def count(self) -> int: ...
 
 
 class ChromaVectorStore:

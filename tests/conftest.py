@@ -4,8 +4,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from papers_agent.infra.chroma_client import VectorStoreClient
-from papers_agent.infra.gemini_client import EmbeddingClient, LLMClient
+from papers_agent.core.ports import EmbeddingClient, LLMClient, VectorStoreClient
 
 
 @pytest.fixture

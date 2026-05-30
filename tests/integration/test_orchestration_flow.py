@@ -21,7 +21,7 @@ from unittest.mock import AsyncMock
 from papers_agent.agents.analyst_agent import AnalystAgent
 from papers_agent.agents.rag_agent import RAGAgent
 from papers_agent.core.catalog import build_catalog
-from papers_agent.infra.chroma_client import QueryResult
+from papers_agent.core.ports import QueryResult
 from papers_agent.tools.compare_papers import ComparePapersTool
 from papers_agent.tools.extract_section import ExtractSectionTool
 from papers_agent.tools.rank_papers import RankPapersTool

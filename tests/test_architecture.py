@@ -7,10 +7,9 @@ cannot drift away from without a deliberate test edit:
   2. Inter-layer imports respect the directional model
      api -> agents -> tools -> infra -> core.
 
-Audited finding: tools/ imports VectorStoreClient / EmbeddingClient /
-LLMClient Protocols from infra/. The rule allows it; the comment on
-LAYER_ALLOWED records the deviation for posterity. If a future refactor
-moves those Protocols to core/, tighten the rule.
+The ports (Protocols + value types) for outbound dependencies live in
+core/ports.py per Dependency Inversion; tools and agents depend on the
+abstraction, never on infra/ adapters directly.
 """
 
 import ast
@@ -27,7 +26,7 @@ LAYER_DIRS = ("core", "infra", "tools", "agents", "api")
 LAYER_ALLOWED: dict[str, set[str]] = {
     "core": set(),
     "infra": {"core"},
-    "tools": {"core", "infra"},  # imports Protocols (Vector/Embedding/LLMClient)
+    "tools": {"core"},  # ports live in core; tools never touch infra adapters
     "agents": {"core", "tools"},
     "api": {"core", "infra", "tools", "agents"},
     "main": {"core", "infra", "tools", "agents", "api"},

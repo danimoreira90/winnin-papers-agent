@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from papers_agent.core.logging import get_logger
 from papers_agent.core.models import PaperContextBundle, ToolResult
-from papers_agent.infra.gemini_client import LLMClient
+from papers_agent.core.ports import LLMClient
 from papers_agent.tools.base import Tool
 
 log = get_logger(__name__)

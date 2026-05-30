@@ -1,12 +1,11 @@
 """Gemini async adapter.
 
-Wraps google-genai 2.x. GeminiEmbeddingClient calls embed_content for
-batch vectors; GeminiLLMClient calls generate_content for one-shot
-text or structured JSON (response_schema). Function-calling lives in
-the OrchestratorAgent (F5), not here.
+Concrete EmbeddingClient + LLMClient implementations backed by
+google-genai 2.x. The Protocols live in papers_agent.core.ports so
+consumers depend on the abstraction. GeminiEmbeddingClient wraps
+embed_content; GeminiLLMClient wraps generate_content (with optional
+response_schema). Function calling lives in OrchestratorAgent, not here.
 """
-
-from typing import Protocol
 
 from pydantic import BaseModel, SecretStr
 from tenacity import (
@@ -43,22 +42,6 @@ _rate_limit_retry = retry(
     stop=stop_after_attempt(5),
     reraise=True,
 )
-
-
-class EmbeddingClient(Protocol):
-    """Async embedding contract."""
-
-    async def embed(self, texts: list[str]) -> list[list[float]]: ...
-
-
-class LLMClient(Protocol):
-    """Async LLM generation contract."""
-
-    async def generate(
-        self,
-        prompt: str,
-        response_schema: type[BaseModel] | None = None,
-    ) -> str: ...
 
 
 class GeminiEmbeddingClient:

@@ -10,8 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from papers_agent.core.logging import get_logger
 from papers_agent.core.models import Chunk, ToolResult
-from papers_agent.infra.chroma_client import VectorStoreClient
-from papers_agent.infra.gemini_client import EmbeddingClient
+from papers_agent.core.ports import EmbeddingClient, VectorStoreClient
 from papers_agent.tools.base import Tool
 
 log = get_logger(__name__)
