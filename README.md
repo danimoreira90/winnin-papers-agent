@@ -240,7 +240,7 @@ de limitacoes).
 apertados; a Q5 (resumo dos cinco papers) e a mais pesada, com cinco `summarize`
 sequenciais. Mitigado com retry em dois niveis, 30s entre perguntas e degradacao
 graciosa (pergunta que estoura cota vira mensagem amigavel e o lote segue). Um
-5/5 limpo sai com chave descansada ou paga; runs repetidos em janela curta podem
+5/5 limpo deve sair com chave descansada ou paga; runs repetidos em janela curta podem
 bater no teto.
 
 **Eco do wrapper AFC.** A SDK do `google-genai` embrulha o retorno das tools em
