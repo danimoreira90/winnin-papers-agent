@@ -124,3 +124,14 @@ class PaperContextBundle(BaseModel):
             if item.paper_id == paper_id:
                 return item.chunks
         return []
+
+    def to_prompt_block(self) -> str:
+        """Markdown-ish block: ## paper_id then chunks joined by '---'.
+
+        Shared format used by compare_papers and rank_papers prompts.
+        """
+        blocks: list[str] = []
+        for item in self.items:
+            chunk_blocks = "\n\n---\n\n".join(c.text for c in item.chunks)
+            blocks.append(f"## {item.paper_id}\n\n{chunk_blocks}")
+        return "\n\n\n".join(blocks)

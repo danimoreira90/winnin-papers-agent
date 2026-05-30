@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from papers_agent.core.models import ToolResult
 
 
-class Tool[InputT: BaseModel, OutputT: BaseModel](ABC):
+class Tool[InputT: BaseModel](ABC):
     """Abstract base for all atomic tools.
 
     Subclasses MUST set the four ClassVars (name, description,

@@ -69,7 +69,7 @@ class RankPapersOutput(BaseModel):
     ranking: list[RankedPaper]
 
 
-class RankPapersTool(Tool[RankPapersInput, RankPapersOutput]):
+class RankPapersTool(Tool[RankPapersInput]):
     """Ranks N papers on one criterion via a single LLM call."""
 
     name = "rank_papers"
@@ -81,8 +81,9 @@ class RankPapersTool(Tool[RankPapersInput, RankPapersOutput]):
         self._llm = llm
 
     async def run(self, inp: RankPapersInput) -> ToolResult:
-        ctx_str = self._format_contexts(inp.contexts)
-        prompt = RANK_PROMPT_TEMPLATE.format(criterion=inp.criterion, contexts=ctx_str)
+        prompt = RANK_PROMPT_TEMPLATE.format(
+            criterion=inp.criterion, contexts=inp.contexts.to_prompt_block()
+        )
         try:
             raw, ms = await self._measured(
                 self._llm.generate(prompt, response_schema=RankPapersOutput)
@@ -106,12 +107,3 @@ class RankPapersTool(Tool[RankPapersInput, RankPapersOutput]):
                 data=RankPapersOutput(criterion=inp.criterion, ranking=[]),
                 error=str(exc),
             )
-
-    @staticmethod
-    def _format_contexts(bundle: PaperContextBundle) -> str:
-        """Markdown-ish block: ## paper_id then chunks joined by '---'."""
-        blocks: list[str] = []
-        for item in bundle.items:
-            chunk_blocks = "\n\n---\n\n".join(c.text for c in item.chunks)
-            blocks.append(f"## {item.paper_id}\n\n{chunk_blocks}")
-        return "\n\n\n".join(blocks)

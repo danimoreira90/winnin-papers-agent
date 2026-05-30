@@ -73,7 +73,7 @@ class ComparePapersOutput(BaseModel):
     synthesis: str
 
 
-class ComparePapersTool(Tool[ComparePapersInput, ComparePapersOutput]):
+class ComparePapersTool(Tool[ComparePapersInput]):
     """Compares N papers on one aspect via a single LLM call."""
 
     name = "compare_papers"
@@ -85,8 +85,9 @@ class ComparePapersTool(Tool[ComparePapersInput, ComparePapersOutput]):
         self._llm = llm
 
     async def run(self, inp: ComparePapersInput) -> ToolResult:
-        ctx_str = self._format_contexts(inp.contexts)
-        prompt = COMPARE_PROMPT_TEMPLATE.format(aspect=inp.aspect, contexts=ctx_str)
+        prompt = COMPARE_PROMPT_TEMPLATE.format(
+            aspect=inp.aspect, contexts=inp.contexts.to_prompt_block()
+        )
         try:
             raw, ms = await self._measured(
                 self._llm.generate(prompt, response_schema=ComparePapersOutput)
@@ -107,12 +108,3 @@ class ComparePapersTool(Tool[ComparePapersInput, ComparePapersOutput]):
                 data=ComparePapersOutput(aspect=inp.aspect, perspectives=[], synthesis=""),
                 error=str(exc),
             )
-
-    @staticmethod
-    def _format_contexts(bundle: PaperContextBundle) -> str:
-        """Markdown-ish block: ## paper_id then chunks joined by '---'."""
-        blocks: list[str] = []
-        for item in bundle.items:
-            chunk_blocks = "\n\n---\n\n".join(c.text for c in item.chunks)
-            blocks.append(f"## {item.paper_id}\n\n{chunk_blocks}")
-        return "\n\n\n".join(blocks)

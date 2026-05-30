@@ -35,7 +35,7 @@ class SearchDocumentsOutput(BaseModel):
     scores: list[float]
 
 
-class SearchDocumentsTool(Tool[SearchDocumentsInput, SearchDocumentsOutput]):
+class SearchDocumentsTool(Tool[SearchDocumentsInput]):
     """Semantic search over the paper corpus. Returns top_k chunks."""
 
     name = "search_documents"

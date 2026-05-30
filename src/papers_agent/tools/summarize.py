@@ -57,7 +57,7 @@ class SummarizeOutput(BaseModel):
     bullets: list[str] = Field(min_length=1)
 
 
-class SummarizeTool(Tool[SummarizeInput, SummarizeOutput]):
+class SummarizeTool(Tool[SummarizeInput]):
     """Summarizes one paper into up to N substantive bullets."""
 
     name = "summarize"

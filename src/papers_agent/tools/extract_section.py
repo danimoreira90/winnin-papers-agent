@@ -46,7 +46,7 @@ class ExtractSectionOutput(BaseModel):
     chunks: list[Chunk] = Field(default_factory=list)
 
 
-class ExtractSectionTool(Tool[ExtractSectionInput, ExtractSectionOutput]):
+class ExtractSectionTool(Tool[ExtractSectionInput]):
     """Extracts a named section of one paper from the vector store."""
 
     name = "extract_section"
