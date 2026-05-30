@@ -26,9 +26,7 @@ async def test_summarize_truncates_to_max_bullets(mock_llm: AsyncMock) -> None:
         char_end=1,
     )
     result = await tool.run(
-        SummarizeInput(
-            paper_id="bert", title="BERT", context_chunks=[ch], max_bullets=5
-        )
+        SummarizeInput(paper_id="bert", title="BERT", context_chunks=[ch], max_bullets=5)
     )
 
     assert result.success
@@ -47,9 +45,7 @@ async def test_summarize_failure_returns_placeholder(mock_llm: AsyncMock) -> Non
         char_start=0,
         char_end=1,
     )
-    result = await tool.run(
-        SummarizeInput(paper_id="rag", title="RAG", context_chunks=[ch])
-    )
+    result = await tool.run(SummarizeInput(paper_id="rag", title="RAG", context_chunks=[ch]))
 
     assert not result.success
     assert result.data.bullets == ["[summarization failed]"]

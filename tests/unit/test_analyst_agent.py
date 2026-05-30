@@ -43,8 +43,6 @@ async def test_summarize_paper_happy_path() -> None:
 async def test_summarize_paper_unknown_id() -> None:
     catalog = MagicMock()
     catalog.get_title.side_effect = KeyError("nope")
-    agent = AnalystAgent(
-        AsyncMock(), AsyncMock(), AsyncMock(), AsyncMock(), catalog
-    )
+    agent = AnalystAgent(AsyncMock(), AsyncMock(), AsyncMock(), AsyncMock(), catalog)
     out = await agent.analyst_summarize_paper("xyz")
     assert "desconhecido" in out.lower()
