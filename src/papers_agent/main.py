@@ -1,7 +1,8 @@
-"""FastAPI application shell for the papers-agent service.
+"""FastAPI application entry point.
 
-The lifespan hook stays a no-op at this stage; database init, repository
-wiring, and router registration land in T6.5 once those modules exist.
+Lifespan brings up structured logging, DDL bootstrap, and the agent
+graph (composition root). All four /threads* routes plus /health are
+mounted here.
 """
 
 from collections.abc import AsyncIterator
@@ -9,14 +10,28 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from papers_agent.api.dependencies import build_orchestrator
+from papers_agent.api.routes import router
+from papers_agent.core.config import get_settings
+from papers_agent.core.logging import configure_logging, get_logger
+from papers_agent.infra.db import init_db
+
+log = get_logger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Lifespan hook - init/dispose will arrive in T6.5 (db init, etc)."""
+    """Init logging, DB schema, and the agent graph; teardown is best-effort."""
+    settings = get_settings()
+    configure_logging(settings.log_level)
+    await init_db()
+    app.state.orchestrator = await build_orchestrator(settings)
+    log.info("app.startup.done")
     yield
 
 
 app = FastAPI(title="Papers Agent", lifespan=lifespan)
+app.include_router(router)
 
 
 @app.get("/health")
