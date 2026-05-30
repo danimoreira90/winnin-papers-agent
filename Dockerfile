@@ -18,9 +18,11 @@ WORKDIR /build
 COPY pyproject.toml ./
 COPY src ./src
 
-# Create venv and install the project (resolves runtime deps from pyproject).
+# Create venv and install the project plus the [test] extras. Test deps
+# (pytest, pytest-asyncio, pytest-cov) ship inside the runtime image so
+# `make test` works against a 100%-local Docker stack, no host setup.
 RUN uv venv /opt/venv \
- && uv pip install --python /opt/venv/bin/python .
+ && uv pip install --python /opt/venv/bin/python ".[test]"
 
 
 # ---------- Stage 2: runtime ----------
@@ -36,9 +38,13 @@ COPY --from=builder /opt/venv /opt/venv
 
 WORKDIR /app
 
-# Application sources and operational scripts (ingest, run_questions).
+# Application sources, operational scripts, and tests. pyproject.toml is
+# copied to /app so pytest picks up [tool.pytest.ini_options] (asyncio_mode,
+# testpaths, pythonpath) when invoked via `make test`.
 COPY --chown=app:app src /app/src
 COPY --chown=app:app scripts /app/scripts
+COPY --chown=app:app tests /app/tests
+COPY --chown=app:app pyproject.toml /app/pyproject.toml
 
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONPATH=/app/src \

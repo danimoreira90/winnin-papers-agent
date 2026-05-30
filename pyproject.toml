@@ -25,6 +25,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Test-only dependencies. Installed into the runtime image so `make test`
+# (which execs `python -m pytest` inside the api container) works end-to-end.
+test = [
+    "pytest>=8",
+    "pytest-asyncio",
+    "pytest-cov",
+]
 dev = [
     "pytest>=8",
     "pytest-asyncio",

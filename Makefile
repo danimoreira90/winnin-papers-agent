@@ -29,7 +29,7 @@ run: up ## Run the Q1-Q5 batch through the orchestrator inside the api container
 	$(COMPOSE) exec -T $(API_SERVICE) python -m scripts.run_questions
 
 test: ## Run the pytest suite inside the api container
-	$(COMPOSE) exec $(API_SERVICE) pytest -v
+	$(COMPOSE) exec -T $(API_SERVICE) python -m pytest -v
 
 logs: ## Tail logs from all services
 	$(COMPOSE) logs -f
