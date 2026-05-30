@@ -12,6 +12,8 @@ import httpx
 
 API_BASE = os.environ.get("API_BASE_URL", "http://localhost:8080")
 
+_QUESTION_DELAY_SECONDS = 30.0
+
 QUESTIONS: list[str] = [
     "Qual é o mecanismo central proposto no paper Attention Is All You Need"
     " e como ele se diferencia de RNNs?",
@@ -63,6 +65,8 @@ async def main() -> None:
             print(f"\n{'=' * 78}\nPERGUNTA {i}: {question}\n{'=' * 78}")
             answer = await _ask(client, question)
             print(answer)
+            if i < len(QUESTIONS):
+                await asyncio.sleep(_QUESTION_DELAY_SECONDS)
 
 
 if __name__ == "__main__":
