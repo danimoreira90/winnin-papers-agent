@@ -43,7 +43,19 @@ class OrchestratorAgent:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=self._api_key.get_secret_value())
+        # Patient retry covers AFC turns the SDK fires internally: free-tier
+        # RPM/TPM bursts on Q5 need a backoff longer than the SDK default.
+        client = genai.Client(
+            api_key=self._api_key.get_secret_value(),
+            http_options=types.HttpOptions(
+                retry_options=types.HttpRetryOptions(
+                    attempts=6,
+                    initial_delay=5.0,
+                    max_delay=64.0,
+                    http_status_codes=[408, 429, 500, 502, 503, 504],
+                ),
+            ),
+        )
         config = types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
             tools=[

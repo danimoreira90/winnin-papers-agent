@@ -37,17 +37,23 @@ async def _wait_for_health(client: httpx.AsyncClient) -> None:
 
 
 async def _ask(client: httpx.AsyncClient, question: str) -> str:
-    """Create a fresh thread, post the question, return the answer text."""
+    """Create a fresh thread, post the question, return the answer text.
+
+    Catches httpx errors so one failed question does not abort the batch.
+    """
     thread_response = await client.post(f"{API_BASE}/threads")
     thread_response.raise_for_status()
     thread_id = thread_response.json()["thread_id"]
-    message_response = await client.post(
-        f"{API_BASE}/threads/{thread_id}/messages",
-        json={"content": question},
-        timeout=300,
-    )
-    message_response.raise_for_status()
-    return str(message_response.json()["response"])
+    try:
+        message_response = await client.post(
+            f"{API_BASE}/threads/{thread_id}/messages",
+            json={"content": question},
+            timeout=600,
+        )
+        message_response.raise_for_status()
+        return str(message_response.json()["response"])
+    except httpx.HTTPError as exc:
+        return f"[falha ao responder: {exc} -- provavel limite de taxa do free tier]"
 
 
 async def main() -> None:
