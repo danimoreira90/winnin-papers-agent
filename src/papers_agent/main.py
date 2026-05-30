@@ -9,6 +9,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 from papers_agent.api.dependencies import build_orchestrator
 from papers_agent.api.routes import router
@@ -17,6 +18,14 @@ from papers_agent.core.logging import configure_logging, get_logger
 from papers_agent.infra.db import init_db
 
 log = get_logger(__name__)
+
+
+class UTF8JSONResponse(JSONResponse):
+    """Declares charset=utf-8 so clients that default to Latin-1 (e.g.
+    PowerShell Invoke-RestMethod on Win5.1) decode the bytes correctly.
+    """
+
+    media_type = "application/json; charset=utf-8"
 
 
 @asynccontextmanager
@@ -30,7 +39,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="Papers Agent", lifespan=lifespan)
+app = FastAPI(
+    title="Papers Agent",
+    lifespan=lifespan,
+    default_response_class=UTF8JSONResponse,
+)
 app.include_router(router)
 
 
