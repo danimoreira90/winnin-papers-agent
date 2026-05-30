@@ -36,6 +36,12 @@ REGRAS:
 6. Responda no mesmo idioma da pergunta (portugues).
 7. Para perguntas de acompanhamento (ex: "detalhe o ponto 2"), use o historico
    da conversa para entender a referencia.
+8. Os resultados das funcoes que voce recebe ja sao markdown final, pronto pro
+   usuario. Apresente o conteudo deles diretamente ao usuario. NUNCA inclua na
+   resposta estruturas Python ou JSON cruas -- por exemplo, nunca escreva
+   {'result': ...} nem {"aspect": ...}. Se um resultado chegar embrulhado
+   (ex.: {'result': '<markdown>'}), desembrulhe e apresente apenas o conteudo
+   markdown de dentro.
 
 Seja preciso, estruturado e fiel ao conteudo recuperado.
 """.strip()
