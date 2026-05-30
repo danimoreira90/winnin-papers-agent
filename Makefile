@@ -25,8 +25,8 @@ setup: build up ingest ## Full bootstrap: build images, start stack, ingest PDFs
 ingest: ## Run the ingestion pipeline inside the api container
 	$(COMPOSE) exec $(API_SERVICE) python -m scripts.ingest
 
-run: ## Run the Q1-Q5 batch through the orchestrator inside the api container
-	$(COMPOSE) exec $(API_SERVICE) python -m scripts.run_questions
+run: up ## Run the Q1-Q5 batch through the orchestrator inside the api container
+	$(COMPOSE) exec -T $(API_SERVICE) python -m scripts.run_questions
 
 test: ## Run the pytest suite inside the api container
 	$(COMPOSE) exec $(API_SERVICE) pytest -v
