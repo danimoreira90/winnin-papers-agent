@@ -9,6 +9,8 @@ google-genai can extract the schema cleanly.
 import asyncio
 from typing import cast
 
+from pydantic import ValidationError
+
 from papers_agent.agents.rag_agent import RAGAgent
 from papers_agent.core.catalog import PaperCatalog
 from papers_agent.core.logging import get_logger
@@ -70,9 +72,14 @@ class AnalystAgent:
                 for pid, chunks in zip(paper_ids, chunk_lists, strict=True)
             ]
         )
-        result = await self._compare.run(
-            ComparePapersInput(paper_ids=paper_ids, aspect=aspect, contexts=bundle)
-        )
+        try:
+            inp = ComparePapersInput(paper_ids=paper_ids, aspect=aspect, contexts=bundle)
+        except ValidationError:
+            return (
+                "Parametros invalidos para comparacao: forneca 2 a 5 paper_ids e um "
+                "aspect entre 3 e 200 caracteres."
+            )
+        result = await self._compare.run(inp)
         if not result.success:
             return f"Falha ao comparar papers: {result.error}"
         return self._format_compare_md(cast(ComparePapersOutput, result.data))
@@ -102,14 +109,19 @@ class AnalystAgent:
             )
         if not chunks:
             return f"Nenhum contexto recuperado para o paper '{paper_id}'."
-        result = await self._summarize.run(
-            SummarizeInput(
+        try:
+            inp = SummarizeInput(
                 paper_id=paper_id,  # type: ignore[arg-type]
                 title=title,
                 context_chunks=chunks,
                 max_bullets=max_bullets,
             )
-        )
+        except ValidationError:
+            return (
+                f"Parametros invalidos para resumir '{paper_id}': "
+                "max_bullets deve estar entre 1 e 10."
+            )
+        result = await self._summarize.run(inp)
         if not result.success:
             return f"Erro ao resumir '{paper_id}': {result.error}"
         return self._format_bullets_md(cast(SummarizeOutput, result.data))
@@ -134,9 +146,14 @@ class AnalystAgent:
                 for pid, chunks in zip(ids, chunk_lists, strict=True)
             ]
         )
-        result = await self._rank.run(
-            RankPapersInput(criterion=criterion, paper_ids=ids, contexts=bundle)
-        )
+        try:
+            inp = RankPapersInput(criterion=criterion, paper_ids=ids, contexts=bundle)
+        except ValidationError:
+            return (
+                "Parametros invalidos para ranquear: forneca 2 a 5 paper_ids e um "
+                "criterion entre 5 e 300 caracteres."
+            )
+        result = await self._rank.run(inp)
         if not result.success:
             return f"Erro ao ranquear: {result.error}"
         return self._format_ranking_md(cast(RankPapersOutput, result.data))
