@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     pdf_dir: pathlib.Path = pathlib.Path("/app/pdfs")
 
     # === SQLite ===
-    database_url: str = "sqlite+aiosqlite:///data/papers_agent.sqlite"
+    database_url: str = "sqlite+aiosqlite:////data/papers_agent.sqlite"
 
     # === Ingestion / RAG ===
     chunk_size: int = Field(default=800, ge=1)
