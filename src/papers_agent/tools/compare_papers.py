@@ -30,6 +30,10 @@ No final, produza uma "synthesis": paragrafo comparativo paralelo que
 contrasta os papers no aspecto.
 
 REGRAS:
+- IDIOMA: o "summary" de cada paper e a "synthesis" final DEVEM ser escritos
+  em portugues do Brasil, mesmo quando os contextos abaixo estiverem em
+  ingles. Os "key_quotes" sao a UNICA excecao: por serem citacoes literais,
+  preservam o idioma original do paper.
 - Use APENAS o conteudo dos contextos fornecidos. Nao invente.
 - Se um paper nao tiver contexto suficiente, declare-o no summary daquele
   paper (ex: "Contexto insuficiente para julgar este aspecto").

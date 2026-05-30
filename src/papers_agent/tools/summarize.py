@@ -20,6 +20,10 @@ log = get_logger(__name__)
 SUMMARIZE_PROMPT_TEMPLATE = """
 Resuma o paper "{title}" em ATE {max_bullets} bullet points substantivos.
 
+IDIOMA: escreva TODOS os bullets em portugues do Brasil. O contexto abaixo esta
+em ingles; ainda assim, a saida deve ser SEMPRE em portugues. Nao copie frases
+literais em ingles.
+
 Cada bullet:
 - Uma frase concreta com fato, contribuicao tecnica ou limitacao.
 - PROIBIDO bullets vagos: "e importante", "e interessante", "traz contribuicoes",

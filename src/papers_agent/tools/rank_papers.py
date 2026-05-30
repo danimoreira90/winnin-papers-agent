@@ -28,6 +28,9 @@ Para cada paper produza:
   concretos do paper.
 
 REGRAS:
+- IDIOMA: cada "justification" DEVE ser escrita em portugues do Brasil, mesmo
+  quando os contextos abaixo estiverem em ingles. Nao reproduza frases em
+  ingles; traduza claims e mecanismos para o portugues.
 - Ordem do array ranking DEVE refletir os ranks (rank 1 primeiro).
 - Ranks 1..N sequenciais, sem buracos, sem empate.
 - Use APENAS o conteudo dos contextos.
